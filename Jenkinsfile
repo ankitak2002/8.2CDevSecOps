@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   tools {
-    nodejs 'Node18'   // Use the NodeJS version you configured in Jenkins Tools
+    nodejs 'Node18'
   }
 
   stages {
@@ -15,14 +15,14 @@ pipeline {
     stage('Install Dependencies') {
       steps {
         echo 'Installing npm dependencies...'
-        sh 'npm install'
+        bat 'npm install'
       }
     }
 
     stage('Run Tests') {
       steps {
         echo 'Running unit tests...'
-        sh 'npm test 2>&1 | tee test-output.txt || true'
+        bat 'npm test > test-output.txt 2>&1 || exit 0'
         archiveArtifacts artifacts: 'test-output.txt', onlyIfSuccessful: false
       }
     }
@@ -30,9 +30,9 @@ pipeline {
     stage('Security Scan') {
       steps {
         echo 'Running npm audit security scan...'
-        sh 'npm audit --json > audit.json || true'
+        bat 'npm audit --json > audit.json || exit 0'
         archiveArtifacts artifacts: 'audit.json', onlyIfSuccessful: false
-        sh 'cat audit.json || true'
+        bat 'type audit.json'
       }
     }
   }
