@@ -37,18 +37,24 @@ pipeline {
     }
 
   
-  stage('SonarCloud Analysis') {
-      environment { SONAR_TOKEN = credentials('SONAR_TOKEN') }
-      steps {
-        echo 'Running SonarCloud analysis...'
-        bat '''
-          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-windows.zip
-          tar -xf sonar-scanner.zip || powershell -Command "Expand-Archive sonar-scanner.zip -DestinationPath sonar-scanner"
-          set SONAR_SCANNER_PATH=sonar-scanner\\sonar-scanner-*
-          %SONAR_SCANNER_PATH%\\bin\\sonar-scanner.bat -Dsonar.login=%SONAR_TOKEN%
-        '''
-      }
-    }
+ stage('SonarCloud Analysis') {
+  environment { SONAR_TOKEN = credentials('SONAR_TOKEN') }
+  steps {
+    echo 'Running SonarCloud analysis...'
+    bat '''
+      curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-windows.zip
+
+      REM Extract the Sonar Scanner zip
+      powershell -Command "Expand-Archive sonar-scanner.zip -DestinationPath sonar-scanner -Force"
+
+      REM Find the extracted folder name dynamically
+      for /d %%i in (sonar-scanner\\sonar-scanner-*) do set "SCANNER_DIR=%%i"
+
+      REM Run Sonar Scanner using the resolved folder
+      "%SCANNER_DIR%\\bin\\sonar-scanner.bat" -Dsonar.login=%SONAR_TOKEN%
+    '''
+  }
+}
 }
 
   post {
