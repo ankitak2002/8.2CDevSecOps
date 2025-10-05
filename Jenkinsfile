@@ -35,6 +35,19 @@ pipeline {
         bat 'type audit.json'
       }
     }
+    stage('SonarCloud Analysis') {
+      environment { SONAR_TOKEN = credentials('SONAR_TOKEN') }
+      steps {
+        echo 'Running SonarCloud analysis...'
+        bat '''
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-windows.zip
+          tar -xf sonar-scanner.zip || powershell -Command "Expand-Archive sonar-scanner.zip -DestinationPath sonar-scanner"
+          set SONAR_SCANNER_PATH=sonar-scanner\\sonar-scanner-*
+          %SONAR_SCANNER_PATH%\\bin\\sonar-scanner.bat -Dsonar.login=%SONAR_TOKEN%
+        '''
+      }
+    }
+
   }
 
   post {
