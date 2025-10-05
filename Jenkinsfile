@@ -35,7 +35,9 @@ pipeline {
         bat 'type audit.json'
       }
     }
-    stage('SonarCloud Analysis') {
+
+  }
+  stage('SonarCloud Analysis') {
       environment { SONAR_TOKEN = credentials('SONAR_TOKEN') }
       steps {
         echo 'Running SonarCloud analysis...'
@@ -47,8 +49,6 @@ pipeline {
         '''
       }
     }
-
-  }
 
   post {
     always {
