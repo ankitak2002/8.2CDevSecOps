@@ -36,7 +36,7 @@ pipeline {
       }
     }
 
-  }
+  
   stage('SonarCloud Analysis') {
       environment { SONAR_TOKEN = credentials('SONAR_TOKEN') }
       steps {
@@ -49,6 +49,7 @@ pipeline {
         '''
       }
     }
+}
 
   post {
     always {
